@@ -1,4 +1,4 @@
-# Mehmet Arda Keskin Progress Journal
+# Arda Keskin Progress Journal
 
 ## Homework 0 (April 5)
 
