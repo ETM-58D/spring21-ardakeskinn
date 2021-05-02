@@ -1,0 +1,127 @@
+---
+title: "ETM58D Business Analytics Homework 1"
+author: "Mehmet Arda Keskin"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 3
+    number_sections: true
+---
+
+# Setup and Loading Libraries
+
+```{r setup, include=TRUE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, include = TRUE,fig.align = "center")
+options(scipen = 999, knitr.kable.NA = "")
+
+library(tidyverse)
+library(EVDS)
+library(lubridate)
+library(readxl)
+library(zoo)
+```
+
+# Loading Data into R Environment
+
+Data for the analysis are imported into R environment from **EVDS** platform of **CBRT** (EVDS API did not work so the data are downloaded manually and imported R from Excel file). The following series are used for the analysis;
+
+* **TP.TIG08** => Unemployment Rate (%) (Level)
+* **TP.DK.USD.A** => USD Exchange Rate (Buying Rate)
+* **TP.KTFTUK** => Weighted Average Interest Rates Applied to Loans Extended by Banks - Consumer Credit (Level)
+* **TP.AB.C2** => CBRT Foreign Exchange Reserves (Million USD Dollar)
+ 
+The question for the analysis is **"Are unemployment rate statistics related to exchange rate of dollar, interest rates and USD reserves of CBRT?"**.
+
+```{r}
+## This code is not working as the web service of EVDS have a problem in connection.
+#set_evds_key("5qNUJJB1Tr")
+
+#data <- get_series(series = c("TP.TIG08", "TP.DK.USD.A", "TP.KTFTUK", "TP.AB.C2"), start_date = "01-01-2017", end_date = "01-01-2021")
+#df <- as_tibble(data$items) %>% 
+#  select(-UNIXTIME) %>% 
+#  na.omit() %>% 
+#  rename(DATE = Tarih,
+#         UNEMP_RATE = TP_TIG08,
+#         USD_TRY = TP_DK_USD_A, 
+#         INT_RATE = TP_KTFTUK, 
+#         USD_RESERVE = TP_AB_C2)
+
+df <- read_excel("EVDS_data.xlsx") %>% 
+  rename(DATE = Tarih,
+         UNEMP_RATE = TP_TIG08,
+         USD_TRY = TP_DK_USD_A,
+         INT_RATE = TP_KTFTUK,
+         USD_RESERVE = TP_AB_C2)
+df
+```
+
+# Data Manipulation for Visualization
+
+Data are manipulated to longer format for the usage of ggplot2 and visualization purposes. In addition, **DATE** variable are converted from string to date format via a function of **zoo** package. 
+
+```{r}
+df2 <-
+  df %>% 
+  pivot_longer(-DATE, names_to = "KEY", values_to = "VALUE") %>% 
+  mutate(VALUE = as.numeric(VALUE),
+         DATE = as.yearmon(DATE))
+df2
+```
+
+# Tasks for Homework
+
+## Task A
+
+Selected time series are visualized as line chart. Comments on charts are below;
+
+* There is an increasing trend for USD exchange rate and a decreasing trend for CBRT foreign exchange reserves for almost entire time period. On the other hand, unemployment rate shows various trends within the time period. Until the beginning of 2018, it shows a decreasing trend. After that, for the whole 2018 it shows an increasing trend. Then, it shows fluctuating trend. In the meantime, interest rate shows increasing trend until the end of the third quarter of 2018 and decreasing trend from there until the mid 2020.
+* There are not much similarity quarterly or monthly over the years for the all time series in the analysis.
+* It seems like there is an abnormal situation around the second half of the 2018 as all charts show abrupt change. The reason of that situation is the economical crisis in that period. There was currency crisis so we can see the peak in USD exchange rate chart at second half of 2018. Also, interest rate chart shows the same peak in that period. It reflects on as a decrease in CBRT foreign exchange reserves and sudden increase in unemployment rate.
+* As a result, we can say that there is somehow a relation between the unemployment rate and the other series.
+
+```{r}
+ggplot(df2, aes(x=DATE,y=VALUE, colour = KEY, group = 1)) +
+  geom_line() + 
+  facet_wrap(vars(KEY), scales = "free_y", dir  = "v") +
+  theme_bw()+
+  theme(legend.position="none" , legend.background = element_rect(fill="gray", linetype="solid")) + 
+  labs(y=NULL) +
+  scale_color_brewer("", palette = "Set1") 
+```
+
+## Task B
+
+Selected search keyword is **"ISSIZLIK"** as it is expected to have high positive correlation with unemployment rate data. Then, the csv data for **"ISSIZLIK"** keyword are downloaded from Google Trends website and imported in R environment.
+
+```{r, message=FALSE}
+gtrends <- read_csv("issizlik_google_trends.csv") %>% mutate(DATE = as_date(DATE, format = "%d.%m.%Y"))
+```
+
+Line plot of the search data of **"ISSIZLIK"** keyword and time series of **unemployment rate** is visualized below. Comments on them also shown below;
+
+* There is a minimum point for the unemployment rate at the beginning of 2018 and we can see that there is a local peak point for the "ISSIZLIK" search keyword. It may be caused by heavy news about the drop in unemployment rate.
+* There is strong and sudden increase during 2018 and local peak at the beginning of 2019. at the same time, we can also see an increasing trend for the "ISSIZLIK" search keyword during 2018 and sudden peak at the beginning of 2019.
+* Around March 2020, there is abnormal increase in "ISSIZLIK" search keyword which is possibly caused by the COVID-19 pandemic. On the other hand, the effect of pandemic on unemployment rate can be seen at mid 2020.
+* Consequently, we can say that there is relationship between two series. 
+
+```{r}
+ggplot(gtrends, aes(x=DATE,y=SEARCH_COUNT)) +
+  geom_line() + 
+  theme_bw()+
+  theme(legend.position="none" , legend.background = element_rect(fill="gray", linetype="solid")) + 
+  labs(y=NULL, title = "ISSIZLIK SEARCH COUNT") +
+  scale_color_brewer("", palette = "Set1")
+
+ggplot(df2 %>% filter(KEY == "UNEMP_RATE"), aes(x=DATE,y=VALUE, colour = KEY, group = 1)) +
+  geom_line() + 
+  theme_bw()+
+  theme(legend.position="none" , legend.background = element_rect(fill="gray", linetype="solid")) + 
+  labs(y=NULL, title = "UNEMPLOYMENT RATE") +
+  scale_color_brewer("", palette = "Set1") 
+```
+
+
