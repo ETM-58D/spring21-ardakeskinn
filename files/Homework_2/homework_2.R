@@ -31,7 +31,7 @@ x_t1 <- df_t1_fit$points[, 1]
 y_t1 <- df_t1_fit$points[, 2]
 
 ## Representing cities on a 2D plot using the reduced dimensions  
-plot(x_t1, y_t1, pch = 19)
+plot(x_t1, y_t1, pch = 19, xlab = "", ylab = "", axes = F, main = "Cities of Turkey")
 text(x_t1, y_t1, pos = 4, cex = 0.6, labels = colnames(df_t1))
 
 
@@ -63,7 +63,7 @@ x_t2 <- df_t2_fit$points[, 1]
 y_t2 <- df_t2_fit$points[, 2]
 
 ## Representing movies on a 2D plot using the reduced dimensions
-plot(x_t2, y_t2, pch = 16)
+plot(x_t2, y_t2, pch = 16, main = "Movies")
 text(x_t2, y_t2, pos = 4, cex = 0.5, labels = titles_t2$X1)
 
 
