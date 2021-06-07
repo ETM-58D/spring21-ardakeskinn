@@ -96,7 +96,7 @@ head(df_t2)
 Creating euclidean distance matrix from the rating data by taking means of ratings for each movie
 
 ```{r}
-df_t2_dist_matrix <- dist(colMeans(df_t2), method = "euclidean", upper = TRUE)
+df_t2_dist_matrix <- dist(t(df_t2), method = "euclidean", upper = TRUE)
 ```
 
 Applying multidimensional scaling (MDS)
@@ -115,7 +115,7 @@ plot(x_t2, y_t2, pch = 16, main = "Movies")
 text(x_t2, y_t2, pos = 4, cex = 0.5, labels = titles_t2$X1)
 ```
 
-As an interesting result, the movies which are in the IMDB top 250 list are generally located nearly and on the left side of the plot.
+As an interesting result, the movies which are in the IMDB top 250 list are generally located nearly and on the left side of the plot. Moreover, the movie series are located nearly like Kill Bill, Lord of the Rings, Spider-Man, Shrek etc.
 
 
 # TASK 3
@@ -174,7 +174,7 @@ df_t3_class_7 <- df_t3_long %>% filter(time_series_id == 7 )
 df_t3_class_8 <- df_t3_long %>% filter(time_series_id == 6 )
 ```
 
-Visualizing the gestures from each class (Subtask a)
+Visualizing the gestures from each class (Subtask a). 3D plots show the brief pattern that collected from experiments. They are not perfectly match the gestures shown in Figure 1 but they show similar pattern.
 
 ```{r}
 scatterplot3d(x=df_t3_class_1$X, 
@@ -245,7 +245,7 @@ scatterplot3d(x=df_t3_class_8$X,
 Applying PCA (Subtask b)
 
 ```{r}
-df_t3_pca <- princomp(df_t3_long %>% select(X,Y,Z), cor = T)
+df_t3_pca <- princomp(df_t3_long %>% filter(time_series_id %in% c(1,2,4,5,6,7,11,15)) %>%  select(X,Y,Z), cor = T)
 summary(df_t3_pca, loadings = T)
 ```
 
@@ -255,12 +255,12 @@ Plotting variances of components. From the plot, it can be seen that most of the
 plot(df_t3_pca, type = "b", main = "Variances of Components")
 ```
 
-Visualizing each data point on a 2D scatter plot with the new coordinates (different colors for each class). 
+Visualizing each data point on a 2D scatter plot with the new coordinates (different colors for each class). We can say that they are similar to gestures in Figure 1.
 
-Component 1 covers **49.06%** of the variance and Component 2 covers **34.67%** of the variance. Thus, in total, **83.73%** of the variance are covered by the two dimensions.
+Component 1 covers **55.94%** of the variance and Component 2 covers **25.13%** of the variance. Thus, in total, **81.07%** of the variance are covered by the two dimensions.
 
 ```{r}
-autoplot(df_t3_pca, data = df_t3_long, colour = "class")
+autoplot(df_t3_pca, data = df_t3_long %>% filter(time_series_id %in% c(1,2,4,5,6,7,11,15)), colour = "class")
 ```
 
 

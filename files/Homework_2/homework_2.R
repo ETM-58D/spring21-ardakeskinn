@@ -54,7 +54,7 @@ df_t2 %<>% mutate_all(~ifelse(is.na(.x), mean(.x, na.rm = TRUE), .x))
 head(df_t2)
 
 ## Creating euclidean distance matrix from the rating data by taking means of ratings for each movie
-df_t2_dist_matrix <- dist(colMeans(df_t2), method = "euclidean", upper = TRUE)
+df_t2_dist_matrix <- dist(t(df_t2), method = "euclidean", upper = TRUE)
 
 ## Applying multidimensional scaling (MDS)
 df_t2_fit <- cmdscale(df_t2_dist_matrix, k = 2, eig = TRUE)
@@ -177,11 +177,11 @@ scatterplot3d(x=df_t3_class_8$X,
 
 
 ## Applying PCA
-df_t3_pca <- princomp(df_t3_long %>% select(X,Y,Z), cor = T)
+df_t3_pca <- princomp(df_t3_long %>% filter(time_series_id %in% c(1,2,4,5,6,7,11,15)) %>%  select(X,Y,Z), cor = T)
 summary(df_t3_pca, loadings = T)
 
 ## Plotting variances of components
 plot(df_t3_pca, type = "b", main = "Variances of Components")
 
 ## Visualizing each data point on a 2D scatter plot with the new coordinates (different colors for each class)
-autoplot(df_t3_pca, data = df_t3_long, colour = "class")
+autoplot(df_t3_pca, data = df_t3_long %>% filter(time_series_id %in% c(1,2,4,5,6,7,11,15)), colour = "class")
