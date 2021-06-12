@@ -11,3 +11,7 @@
 ## Homework 2 (June 9)
 
 [Here](files/Homework_2/homework_2.html) is my answers for the Homework 2.
+
+## Homework 3&4 (June 23)
+
+[Here](files/Homework_3&4/homework_3-4.html) is my answers for the Homework 3&4.
